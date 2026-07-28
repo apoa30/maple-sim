@@ -1,14 +1,14 @@
 package org.ironmaple.simulation.drivesims;
 
-import static edu.wpi.first.units.Units.*;
+import static org.wpilib.units.Units.*;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.units.measure.*;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.math.kinematics.SwerveDriveKinematics;
+import org.wpilib.math.kinematics.SwerveModuleVelocity;
+import org.wpilib.units.measure.*;
 import java.util.Arrays;
 import java.util.function.Supplier;
 import org.dyn4j.geometry.Vector2;
@@ -49,7 +49,7 @@ import org.ironmaple.utils.mathutils.GeometryConvertor;
  *   <li>Obtain the {@link SwerveModuleSimulation} instances through {@link #getModules()}.
  *   <li>Create an <a href='https://github.com/Mechanical-Advantage/AdvantageKit/blob/main/docs/RECORDING-INPUTS.md'>IO
  *       Implementation</a> that wraps around {@link SwerveModuleSimulation} to retrieve encoder readings.
- *   <li>Update a {@link edu.wpi.first.math.estimator.SwerveDrivePoseEstimator} using the encoder readings, similar to
+ *   <li>Update a {@link org.wpilib.math.estimator.SwerveDrivePoseEstimator} using the encoder readings, similar to
  *       how you would on a real robot.
  * </ul>
  *
@@ -70,7 +70,7 @@ public class SwerveDriveSimulation extends AbstractDriveTrainSimulation {
     protected final SwerveDriveKinematics kinematics;
     private final Translation2d centerOfMassOffset;
     private final double totalWeightNewtons;
-    private ChassisSpeeds previousChassisSpeeds = new ChassisSpeeds();
+    private ChassisVelocities previousChassisVelocities = new ChassisVelocities();
 
     /**
      *
@@ -125,7 +125,7 @@ public class SwerveDriveSimulation extends AbstractDriveTrainSimulation {
         gyroSimulation.updateSimulationSubTick(super.getAngularVelocity());
 
         // Update previous chassis speeds for next iteration
-        previousChassisSpeeds = getDriveTrainSimulatedChassisSpeedsRobotRelative();
+        previousChassisVelocities = getDriveTrainSimulatedChassisVelocitiesRobotRelative();
     }
 
     /**
@@ -152,10 +152,10 @@ public class SwerveDriveSimulation extends AbstractDriveTrainSimulation {
             final Vector2 moduleGroundVelocity = super.getLinearVelocity(moduleWorldPosition);
 
             // Get module's desired velocity from its current state
-            final SwerveModuleState moduleState = moduleSimulations[i].getCurrentState();
+            final SwerveModuleVelocity moduleState = moduleSimulations[i].getCurrentState();
             final Rotation2d moduleWorldFacing = moduleState.angle.plus(robotRotation);
             final Vector2 desiredModuleVelocity =
-                    Vector2.create(moduleState.speedMetersPerSecond, moduleWorldFacing.getRadians());
+                    Vector2.create(moduleState.velocity, moduleWorldFacing.getRadians());
 
             // Calculate velocity difference (direction friction force should pull)
             final Vector2 velocityDifference = new Vector2(
@@ -243,10 +243,10 @@ public class SwerveDriveSimulation extends AbstractDriveTrainSimulation {
      *
      * @return the desired chassis speeds, robot-relative
      */
-    private ChassisSpeeds getDesiredSpeed() {
-        return kinematics.toChassisSpeeds(Arrays.stream(moduleSimulations)
+    private ChassisVelocities getDesiredSpeed() {
+        return kinematics.toChassisVelocities(Arrays.stream(moduleSimulations)
                 .map((SwerveModuleSimulation::getFreeSpinState))
-                .toArray(SwerveModuleState[]::new));
+                .toArray(SwerveModuleVelocity[]::new));
     }
 
     /**
@@ -260,10 +260,10 @@ public class SwerveDriveSimulation extends AbstractDriveTrainSimulation {
      *
      * @return the module speeds, robot-relative
      */
-    private ChassisSpeeds getModuleSpeeds() {
-        return kinematics.toChassisSpeeds(Arrays.stream(moduleSimulations)
+    private ChassisVelocities getModuleSpeeds() {
+        return kinematics.toChassisVelocities(Arrays.stream(moduleSimulations)
                 .map((SwerveModuleSimulation::getCurrentState))
-                .toArray(SwerveModuleState[]::new));
+                .toArray(SwerveModuleVelocity[]::new));
     }
 
     /**
@@ -377,15 +377,15 @@ public class SwerveDriveSimulation extends AbstractDriveTrainSimulation {
         final double yCom = centerOfMassOffset.getY();
         final double zCom = config.centerOfMass.getZ();
 
-        final ChassisSpeeds currentSpeeds = getDriveTrainSimulatedChassisSpeedsRobotRelative();
+        final ChassisVelocities currentSpeeds = getDriveTrainSimulatedChassisVelocitiesRobotRelative();
         final double dt = SimulatedArena.getSimulationDt().in(Seconds);
 
         // Calculate accelerations of the geometric center of the robot
-        final double chassisAccelX = (currentSpeeds.vxMetersPerSecond - previousChassisSpeeds.vxMetersPerSecond) / dt;
-        final double chassisAccelY = (currentSpeeds.vyMetersPerSecond - previousChassisSpeeds.vyMetersPerSecond) / dt;
-        final double chassisOmega = currentSpeeds.omegaRadiansPerSecond;
+        final double chassisAccelX = (currentSpeeds.vx - previousChassisVelocities.vx) / dt;
+        final double chassisAccelY = (currentSpeeds.vy - previousChassisVelocities.vy) / dt;
+        final double chassisOmega = currentSpeeds.omega;
         final double chassisAlpha =
-                (currentSpeeds.omegaRadiansPerSecond - previousChassisSpeeds.omegaRadiansPerSecond) / dt;
+                (currentSpeeds.omega - previousChassisVelocities.omega) / dt;
 
         // Calculate acceleration of center of mass
         // a_com = a_geometric_center + alpha × r_com + omega × (omega × r_com)

@@ -1,14 +1,14 @@
 package org.ironmaple.simulation.seasonspecific.rebuilt2026;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
+import static org.wpilib.units.Units.Inches;
+import static org.wpilib.units.Units.Meters;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.Distance;
+import org.wpilib.units.measure.LinearVelocity;
 import org.ironmaple.simulation.gamepieces.GamePieceProjectile;
 
 /**
@@ -28,7 +28,7 @@ public class RebuiltFuelOnFly extends GamePieceProjectile {
     public RebuiltFuelOnFly(
             Translation2d robotPosition,
             Translation2d shooterPositionOnRobot,
-            ChassisSpeeds chassisSpeeds,
+            ChassisVelocities ChassisVelocities,
             Rotation2d shooterFacing,
             Distance initialHeight,
             LinearVelocity launchingSpeed,
@@ -37,7 +37,7 @@ public class RebuiltFuelOnFly extends GamePieceProjectile {
                 RebuiltFuelOnField.REBUILT_FUEL_INFO,
                 robotPosition,
                 shooterPositionOnRobot,
-                chassisSpeeds,
+                ChassisVelocities,
                 shooterFacing,
                 initialHeight,
                 launchingSpeed,

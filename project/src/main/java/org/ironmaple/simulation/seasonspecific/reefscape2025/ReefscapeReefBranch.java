@@ -1,16 +1,17 @@
 package org.ironmaple.simulation.seasonspecific.reefscape2025;
 
-import static edu.wpi.first.units.Units.Centimeters;
-import static edu.wpi.first.units.Units.Degrees;
+import static org.wpilib.units.Units.Centimeters;
+import static org.wpilib.units.Units.Degrees;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.wpilibj.DriverStation;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Transform3d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.units.Units;
+import org.wpilib.driverstation.RobotState;
+
 import java.util.Arrays;
 import java.util.List;
 import org.ironmaple.simulation.Goal;
@@ -147,7 +148,7 @@ public class ReefscapeReefBranch extends Goal {
                 position,
                 pieceAngle != null
                         ? pieceAngle
-                        : new Rotation3d(0, 0, branchesFacingOutwardsBlue[column].getRadians()).plus(flip90));
+                        : new Rotation3d(0, 0, branchesFacingOutwardsBlue[column].getRadians()).rotateBy(flip90));
     }
 
     @Override
@@ -167,10 +168,10 @@ public class ReefscapeReefBranch extends Goal {
     @Override
     protected void addPoints() {
         System.out.println("Coral scored on level: " + (level + 1) + " on the " + (isBlue ? "Blue " : "Red") + "reef");
-        arena.addValueToMatchBreakdown(isBlue, "Auto/CoralScoredInAuto", DriverStation.isAutonomous() ? 1 : 0);
+        arena.addValueToMatchBreakdown(isBlue, "Auto/CoralScoredInAuto", RobotState.isAutonomous() ? 1 : 0);
         arena.addValueToMatchBreakdown(isBlue, "CoralScoredOnLevel " + String.valueOf(level + 1), 1);
 
-        if (DriverStation.isAutonomous()) {
+        if (RobotState.isAutonomous()) {
             switch (level) {
                 case 3:
                     arena.addToScore(isBlue, 7);

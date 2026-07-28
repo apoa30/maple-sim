@@ -1,16 +1,16 @@
 package org.ironmaple.simulation.gamepieces;
 
-import static edu.wpi.first.units.Units.Kilogram;
-import static edu.wpi.first.units.Units.Meters;
+import static org.wpilib.units.Units.Kilogram;
+import static org.wpilib.units.Units.Meters;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.Mass;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.units.measure.Distance;
+import org.wpilib.units.measure.Mass;
 import java.util.function.DoubleSupplier;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
@@ -108,11 +108,11 @@ public class GamePieceOnFieldSimulation extends Body implements GamePiece {
      *
      * <h2>Sets the world velocity of this game piece.</h2>
      *
-     * @param chassisSpeedsWorldFrame the speeds of the game piece
+     * @param ChassisVelocitiesWorldFrame the speeds of the game piece
      */
-    public void setVelocity(ChassisSpeeds chassisSpeedsWorldFrame) {
-        super.setLinearVelocity(GeometryConvertor.toDyn4jLinearVelocity(chassisSpeedsWorldFrame));
-        super.setAngularVelocity(chassisSpeedsWorldFrame.omegaRadiansPerSecond);
+    public void setVelocity(ChassisVelocities ChassisVelocitiesWorldFrame) {
+        super.setLinearVelocity(GeometryConvertor.toDyn4jLinearVelocity(ChassisVelocitiesWorldFrame));
+        super.setAngularVelocity(ChassisVelocitiesWorldFrame.omega);
     }
 
     /**

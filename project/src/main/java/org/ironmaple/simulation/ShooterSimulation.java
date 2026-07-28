@@ -1,22 +1,22 @@
 package org.ironmaple.simulation;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Volts;
+import static org.wpilib.units.Units.Amps;
+import static org.wpilib.units.Units.Radians;
+import static org.wpilib.units.Units.RadiansPerSecond;
+import static org.wpilib.units.Units.Volts;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.Voltage;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Transform3d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.AngularVelocity;
+import org.wpilib.units.measure.Current;
+import org.wpilib.units.measure.LinearVelocity;
+import org.wpilib.units.measure.Voltage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -249,7 +249,7 @@ public class ShooterSimulation implements SimulatedArena.Simulatable {
 
         // 2. Calculate Muzzle Velocity in World Frame
         // 2a. Muzzle velocity relative to shooter
-        double vMuzzle = velocity.in(edu.wpi.first.units.Units.MetersPerSecond);
+        double vMuzzle = velocity.in(org.wpilib.units.Units.MetersPerSecond);
         double pitchRad = pitch.in(Radians);
 
         // Assuming pitch is rotation around local Y axis (up/down), and shooter faces
@@ -262,8 +262,8 @@ public class ShooterSimulation implements SimulatedArena.Simulatable {
         Translation2d vXYWorldFromMuzzle = new Translation2d(vXLocal, 0).rotateBy(shooterYaw);
 
         // 2c. Add Robot Velocity
-        ChassisSpeeds robotSpeeds = driveTrainSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative();
-        Translation2d robotVXY = new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond);
+        ChassisVelocities robotSpeeds = driveTrainSimulation.getDriveTrainSimulatedChassisVelocitiesFieldRelative();
+        Translation2d robotVXY = new Translation2d(robotSpeeds.vx, robotSpeeds.vy);
         Translation2d totalVXY = vXYWorldFromMuzzle.plus(robotVXY);
 
         // 3. Create Projectile
@@ -273,7 +273,7 @@ public class ShooterSimulation implements SimulatedArena.Simulatable {
                 totalVXY,
                 shooterPoseWorld.getZ(),
                 vZLocal, // Ignoring vertical robot velocity for simplicity unless we want to add it
-                shooterPoseWorld.getRotation().plus(new Rotation3d(0, -pitchRad, 0)) // Visual rotation
+                shooterPoseWorld.getRotation().rotateBy(new Rotation3d(0, -pitchRad, 0)) // Visual rotation
                 );
 
         SimulatedArena.getInstance().getGamePieceManager().spawnInFlight(projectile);

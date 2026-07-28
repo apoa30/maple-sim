@@ -1,8 +1,8 @@
 package org.ironmaple.simulation.physics;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.units.measure.Time;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.units.measure.Time;
 import java.util.Optional;
 
 /**

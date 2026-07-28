@@ -15,13 +15,13 @@ import java.util.Deque;
  *
  * <pre>
  * // Create buffer with 15ms delay
- * LatencyBuffer&lt;SwerveModuleState&gt; buffer = new LatencyBuffer&lt;&gt;(0.015, initialState);
+ * LatencyBuffer&lt;SwerveModuleVelocity&gt; buffer = new LatencyBuffer&lt;&gt;(0.015, initialState);
  *
  * // Each simulation tick, add current command
  * buffer.add(currentTime, commandedState);
  *
  * // Get the delayed state (what the motor actually sees)
- * SwerveModuleState delayedState = buffer.get(currentTime);
+ * SwerveModuleVelocity delayedState = buffer.get(currentTime);
  * </pre>
  *
  * @param <T> the type of value to buffer

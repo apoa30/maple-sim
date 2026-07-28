@@ -3,8 +3,8 @@ package org.ironmaple.simulation.physics.bullet;
 import com.jme3.bullet.objects.PhysicsRigidBody;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Translation3d;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Translation3d;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.ironmaple.simulation.physics.PhysicsBody;
 

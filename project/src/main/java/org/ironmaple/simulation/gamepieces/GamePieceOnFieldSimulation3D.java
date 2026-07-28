@@ -1,10 +1,10 @@
 package org.ironmaple.simulation.gamepieces;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.units.measure.Mass;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.units.measure.Mass;
 import org.ironmaple.simulation.SimulatedArena3D;
 import org.ironmaple.simulation.physics.PhysicsBody;
 import org.ironmaple.simulation.physics.PhysicsEngine;
@@ -51,7 +51,7 @@ public class GamePieceOnFieldSimulation3D implements GamePiece, SimulatedArena3D
 
         this.physicsBody = engine.createDynamicBody(
                 info.shape(),
-                info.mass().in(edu.wpi.first.units.Units.Kilograms),
+                info.mass().in(org.wpilib.units.Units.Kilograms),
                 info.friction(),
                 info.coefficientOfRestitution(),
                 info.linearDamping(),

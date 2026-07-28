@@ -1,13 +1,13 @@
 package org.ironmaple.simulation.gamepieces;
 
-import static edu.wpi.first.units.Units.*;
+import static org.wpilib.units.Units.*;
 
-import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.wpilibj.Timer;
+import org.wpilib.math.geometry.*;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.Distance;
+import org.wpilib.units.measure.LinearVelocity;
+import org.wpilib.system.Timer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -109,7 +109,7 @@ public class GamePieceProjectile implements GamePiece {
      * @param robotPosition the position of the robot (not the shooter) at the time of launching the game piece
      * @param shooterPositionOnRobot the translation from the shooter's position to the robot's center, in the robot's
      *     frame of reference
-     * @param chassisSpeedsFieldRelative the field-relative velocity of the robot chassis when launching the game piece,
+     * @param ChassisVelocitiesFieldRelative the field-relative velocity of the robot chassis when launching the game piece,
      *     influencing the initial velocity of the game piece
      * @param shooterFacing the direction in which the shooter is facing at launch
      * @param initialHeight the initial height of the game piece when launched, i.e., the height of the shooter from the
@@ -121,7 +121,7 @@ public class GamePieceProjectile implements GamePiece {
             GamePieceOnFieldSimulation.GamePieceInfo info,
             Translation2d robotPosition,
             Translation2d shooterPositionOnRobot,
-            ChassisSpeeds chassisSpeedsFieldRelative,
+            ChassisVelocities ChassisVelocitiesFieldRelative,
             Rotation2d shooterFacing,
             Distance initialHeight,
             LinearVelocity launchingSpeed,
@@ -131,7 +131,7 @@ public class GamePieceProjectile implements GamePiece {
                 robotPosition.plus(shooterPositionOnRobot.rotateBy(shooterFacing)),
                 calculateInitialProjectileVelocityMPS(
                         shooterPositionOnRobot,
-                        chassisSpeedsFieldRelative,
+                        ChassisVelocitiesFieldRelative,
                         shooterFacing,
                         launchingSpeed.in(MetersPerSecond) * Math.cos(shooterAngle.in(Radians))),
                 initialHeight.in(Meters),
@@ -148,7 +148,7 @@ public class GamePieceProjectile implements GamePiece {
      * translational and rotational motion as well as the shooter's ground speed.
      *
      * @param shooterPositionOnRobot the translation of the shooter on the robot, in the robot's frame of reference
-     * @param chassisSpeeds the speeds of the chassis when the game piece is launched, including translational and
+     * @param ChassisVelocities the speeds of the chassis when the game piece is launched, including translational and
      *     rotational velocities
      * @param chassisFacing the direction the chassis is facing at the time of the launch
      * @param groundSpeedMPS the ground component of the projectile's initial velocity, provided as a scalar in meters
@@ -157,17 +157,17 @@ public class GamePieceProjectile implements GamePiece {
      */
     private static Translation2d calculateInitialProjectileVelocityMPS(
             Translation2d shooterPositionOnRobot,
-            ChassisSpeeds chassisSpeeds,
+            ChassisVelocities ChassisVelocities,
             Rotation2d chassisFacing,
             double groundSpeedMPS) {
         final Translation2d
                 chassisTranslationalVelocity =
-                        new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond),
+                        new Translation2d(ChassisVelocities.vx, ChassisVelocities.vy),
                 shooterGroundVelocityDueToChassisRotation =
                         shooterPositionOnRobot
                                 .rotateBy(chassisFacing)
                                 .rotateBy(Rotation2d.fromDegrees(90))
-                                .times(chassisSpeeds.omegaRadiansPerSecond),
+                                .times(ChassisVelocities.omega),
                 shooterGroundVelocity = chassisTranslationalVelocity.plus(shooterGroundVelocityDueToChassisRotation);
 
         return shooterGroundVelocity.plus(new Translation2d(groundSpeedMPS, chassisFacing));

@@ -1,17 +1,17 @@
 package org.ironmaple.simulation.motorsims;
 
-import static edu.wpi.first.units.Units.*;
+import static org.wpilib.units.Units.*;
 
-import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.units.measure.*;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import org.wpilib.units.measure.*;
+import org.wpilib.simulation.DCMotorSim;
+import org.wpilib.math.system.Models;
 
 /**
  *
  *
- * <h1>{@link edu.wpi.first.wpilibj.simulation.DCMotorSim} with a bit of extra spice.</h1>
+ * <h1>{@link org.wpilib.wpilibj.simulation.DCMotorSim} with a bit of extra spice.</h1>
  *
- * <p>This class extends the functionality of the original {@link edu.wpi.first.wpilibj.simulation.DCMotorSim} and
+ * <p>This class extends the functionality of the original {@link org.wpilib.wpilibj.simulation.DCMotorSim} and
  * models the following aspects in addition:
  *
  * <ul>
@@ -38,10 +38,13 @@ public class MapleMotorSim {
         this.configs = configs;
         this.controller = (mechanismAngle, mechanismVelocity, encoderAngle, encoderVelocity) -> Volts.of(0);
         this.motorSim = new DCMotorSim(
-                LinearSystemId.createDCMotorSystem(
-                        configs.motor, configs.loadMOI.in(KilogramSquareMeters), configs.gearing),
-                configs.motor);
-
+                Models.singleJointedArmFromPhysicalConstants(
+                        configs.motor, 
+                        configs.loadMOI.in(KilogramSquareMeters), 
+                        configs.gearing
+                ),
+                configs.motor
+        ); // I would probably create the two-state factory manually if this doesn't work
         SimulatedBattery.addMotor(this);
     }
 
@@ -50,7 +53,7 @@ public class MapleMotorSim {
      *
      * <h2>Updates the simulation.</h2>
      *
-     * <p>This is equivalent to{@link edu.wpi.first.wpilibj.simulation.DCMotorSim#update(double)}.
+     * <p>This is equivalent to{@link org.wpilib.wpilibj.simulation.DCMotorSim#update(double)}.
      */
     private Torque externalTorque = NewtonMeters.zero();
 
@@ -59,22 +62,35 @@ public class MapleMotorSim {
      *
      * <h2>Updates the simulation.</h2>
      *
-     * <p>This is equivalent to{@link edu.wpi.first.wpilibj.simulation.DCMotorSim#update(double)}.
+     * <p>This is equivalent to{@link org.wpilib.wpilibj.simulation.DCMotorSim#update(double)}.
      */
     public void update(Time dt) {
+        double currentPositionRad = motorSim.getAngularPosition(); 
+        double currentVelocityRadPerSec = motorSim.getAngularVelocity();
+
+        // Calculate the scaled mechanism velocities using standard primitive * operators
+        double mechanismVelocityRadPerSec = currentVelocityRadPerSec * configs.gearing;
+
+        // 2. Wrap the doubles back into unit objects for your controller
         var appliedVoltage = controller.updateControlSignal(
-                motorSim.getAngularPosition(),
-                motorSim.getAngularVelocity(),
-                motorSim.getAngularPosition().times(configs.gearing),
-                motorSim.getAngularVelocity().times(configs.gearing));
+                Radians.of(currentPositionRad),
+                RadiansPerSecond.of(currentVelocityRadPerSec),
+                Radians.of(0.0), // Fill with your actual target angle if you have one
+                RadiansPerSecond.of(mechanismVelocityRadPerSec) 
+        );
+
         appliedVoltage = SimulatedBattery.clamp(appliedVoltage);
 
-        if (Math.abs(appliedVoltage.in(Volts)) < configs.getFrictionVoltage().in(Volts)) {
+        // 3. Keep voltage alterations primitive-safe
+        double voltageVolts = appliedVoltage.in(Volts);
+        double frictionVolts = configs.getFrictionVoltage().in(Volts);
+
+        if (Math.abs(voltageVolts) < frictionVolts) {
             appliedVoltage = Volts.zero();
-        } else if (appliedVoltage.in(Volts) > 0.0) {
-            appliedVoltage = appliedVoltage.minus(configs.getFrictionVoltage());
-        } else if (appliedVoltage.in(Volts) < 0.0) {
-            appliedVoltage = appliedVoltage.plus(configs.getFrictionVoltage());
+        } else if (voltageVolts > 0.0) {
+            appliedVoltage = Volts.of(voltageVolts - frictionVolts);
+        } else if (voltageVolts < 0.0) {
+            appliedVoltage = Volts.of(voltageVolts + frictionVolts);
         }
 
         motorSim.setInputVoltage(appliedVoltage.in(Volts));
@@ -98,15 +114,19 @@ public class MapleMotorSim {
             // But the linter says Setter takes double.
             // And Getter returns AngularVelocity.
             // So we convert Getter to double, add delta, pass to Setter.
-            motorSim.setAngularVelocity(motorSim.getAngularVelocity().in(RadiansPerSecond) + deltaOmegaMotor);
-            motorSim.setAngle(motorSim.getAngularPosition().in(Radians) + deltaOmegaMotor * dt.in(Seconds));
+            motorSim.setAngularVelocity(motorSim.getAngularVelocity() + deltaOmegaMotor);
+            motorSim.setAngle(motorSim.getAngularPosition() + deltaOmegaMotor * dt.in(Seconds));
         }
 
-        if (motorSim.getAngularPosition().lte(configs.reverseHardwareLimit)) {
-            motorSim.setAngle(configs.reverseHardwareLimit.in(Radians));
+        double currentPos = motorSim.getAngularPosition();
+        double reverseLimit = configs.reverseHardwareLimit.in(Radians);
+        double forwardLimit = configs.forwardHardwareLimit.in(Radians);
+
+        if (currentPos <= reverseLimit) {
+            motorSim.setAngle(reverseLimit);
             motorSim.setAngularVelocity(0);
-        } else if (motorSim.getAngularPosition().gte(configs.forwardHardwareLimit)) {
-            motorSim.setAngle(configs.forwardHardwareLimit.in(Radians));
+        } else if (currentPos >= forwardLimit) {
+            motorSim.setAngle(forwardLimit);
             motorSim.setAngularVelocity(0);
         }
     }
@@ -139,12 +159,12 @@ public class MapleMotorSim {
      *
      * <h2>Obtains the <strong>final</strong> position of the mechanism.</h2>
      *
-     * <p>This is equivalent to {@link edu.wpi.first.wpilibj.simulation.DCMotorSim#getAngularPosition()}.
+     * <p>This is equivalent to {@link org.wpilib.wpilibj.simulation.DCMotorSim#getAngularPosition()}.
      *
      * @return the angular position of the mechanism, continuous
      */
     public Angle getAngularPosition() {
-        return motorSim.getAngularPosition();
+        return Radians.of(motorSim.getAngularPosition());
     }
 
     /**
@@ -163,12 +183,12 @@ public class MapleMotorSim {
      *
      * <h2>Obtains the <strong>final</strong> velocity of the mechanism.</h2>
      *
-     * <p>This is equivalent to {@link edu.wpi.first.wpilibj.simulation.DCMotorSim#getAngularVelocity()}.
+     * <p>This is equivalent to {@link org.wpilib.wpilibj.simulation.DCMotorSim#getAngularVelocity()}.
      *
      * @return the final angular velocity of the mechanism
      */
     public AngularVelocity getVelocity() {
-        return motorSim.getAngularVelocity();
+        return RadiansPerSecond.of(motorSim.getAngularVelocity());
     }
 
     /**
@@ -210,7 +230,7 @@ public class MapleMotorSim {
      * @return the stator current of the motor
      */
     public Current getStatorCurrent() {
-        return Amps.of(motorSim.getCurrentDrawAmps());
+        return Amps.of(motorSim.getCurrentDraw());
     }
 
     /**

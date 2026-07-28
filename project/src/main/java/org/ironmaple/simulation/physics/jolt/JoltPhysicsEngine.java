@@ -4,9 +4,11 @@ import com.github.stephengold.joltjni.*;
 import com.github.stephengold.joltjni.enumerate.EActivation;
 import com.github.stephengold.joltjni.enumerate.EMotionType;
 import com.github.stephengold.joltjni.readonly.ConstShape;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.units.measure.Time;
+
+import org.wpilib.framework.RobotBase;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.units.measure.Time;
 import electrostatic4j.snaploader.LibraryInfo;
 import electrostatic4j.snaploader.LoadingCriterion;
 import electrostatic4j.snaploader.NativeBinaryLoader;
@@ -88,7 +90,7 @@ public class JoltPhysicsEngine implements PhysicsEngine {
 
     @Override
     public void initialize() {
-        if (edu.wpi.first.wpilibj.RobotBase.isReal()) {
+        if (RobotBase.isReal()) {
             throw new IllegalStateException(
                     "CRITICAL: 3D Physics Engines (Jolt/Bullet) CANNOT be executed on the RoboRIO. "
                             + "They rely on un-compiled heavy native binaries and require heavy multi-threading. "
@@ -760,11 +762,11 @@ public class JoltPhysicsEngine implements PhysicsEngine {
         return JoltBody.toTranslation3d(v);
     }
 
-    public static Quat toQuat(edu.wpi.first.math.geometry.Rotation3d r) {
+    public static Quat toQuat(org.wpilib.math.geometry.Rotation3d r) {
         return JoltBody.toQuat(r);
     }
 
-    public static edu.wpi.first.math.geometry.Rotation3d toRotation3d(Quat q) {
+    public static org.wpilib.math.geometry.Rotation3d toRotation3d(Quat q) {
         return JoltBody.toRotation3d(q);
     }
 }

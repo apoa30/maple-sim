@@ -1,23 +1,25 @@
 package org.ironmaple.simulation.seasonspecific.rebuilt2026;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
+import static org.wpilib.units.Units.Degrees;
+import static org.wpilib.units.Units.Inches;
+import static org.wpilib.units.Units.Meters;
+import static org.wpilib.units.Units.MetersPerSecond;
 import static org.ironmaple.utils.FieldMirroringUtils.*;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.networktables.BooleanPublisher;
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.wpilibj.DriverStation;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.networktables.BooleanPublisher;
+import org.wpilib.networktables.DoublePublisher;
+import org.wpilib.units.Units;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.Distance;
+import org.wpilib.units.measure.LinearVelocity;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.RobotState;
+
 import java.util.List;
 import org.dyn4j.dynamics.Settings;
 import org.ironmaple.simulation.SimulatedArena;
@@ -165,7 +167,7 @@ public class Arena2026Rebuilt extends SimulatedArena implements Arena2026 {
      * @param robotPosition the position of the robot (not the shooter) at the time of launching the game piece
      * @param shooterPositionOnRobot the translation from the shooter's position to the robot's center, in the robot's
      *     frame of reference
-     * @param chassisSpeedsFieldRelative the field-relative velocity of the robot chassis when launching the game piece,
+     * @param ChassisVelocitiesFieldRelative the field-relative velocity of the robot chassis when launching the game piece,
      *     influencing the initial velocity of the game piece
      * @param shooterFacing the direction in which the shooter is facing at launch
      * @param initialHeight the initial height of the game piece when launched, i.e., the height of the shooter from the
@@ -192,7 +194,7 @@ public class Arena2026Rebuilt extends SimulatedArena implements Arena2026 {
         var projectile = new RebuiltFuelOnFly(
                 piecePose.plus(new Translation2d(randomInRange(xVariance), randomInRange(yVariance))),
                 new Translation2d(),
-                new ChassisSpeeds(),
+                new ChassisVelocities(),
                 yaw.plus(Rotation2d.fromDegrees(randomInRange(yawVariance))),
                 height,
                 speed.plus(MetersPerSecond.of(randomInRange(speedVariance))),
@@ -209,8 +211,8 @@ public class Arena2026Rebuilt extends SimulatedArena implements Arena2026 {
         double spacing = fuelDiameter + fuelSeparationGap;
 
         // Dimensions from graphic
-        double boundingBoxWidth = edu.wpi.first.units.Units.Inches.of(206).in(edu.wpi.first.units.Units.Meters);
-        double boundingBoxDepth = edu.wpi.first.units.Units.Inches.of(72).in(edu.wpi.first.units.Units.Meters);
+        double boundingBoxWidth = org.wpilib.units.Units.Inches.of(206).in(org.wpilib.units.Units.Meters);
+        double boundingBoxDepth = org.wpilib.units.Units.Inches.of(72).in(org.wpilib.units.Units.Meters);
 
         java.util.List<Translation2d> q1 = new java.util.ArrayList<>();
         java.util.List<Translation2d> q2 = new java.util.ArrayList<>();
@@ -221,7 +223,7 @@ public class Arena2026Rebuilt extends SimulatedArena implements Arena2026 {
         // We want uniform spacing of 'fuelSeparationGap' between all pieces, including
         // across the axes.
         // So the first piece center should be at (radius + gap/2) from the axis.
-        double dividerWidth = edu.wpi.first.units.Units.Inches.of(2).in(edu.wpi.first.units.Units.Meters);
+        double dividerWidth = org.wpilib.units.Units.Inches.of(2).in(org.wpilib.units.Units.Meters);
         double startX = dividerWidth / 2 + fuelSeparationGap + fuelRadius;
         double startY = dividerWidth / 2 + fuelSeparationGap + fuelRadius;
 
@@ -311,7 +313,7 @@ public class Arena2026Rebuilt extends SimulatedArena implements Arena2026 {
     }
 
     public void simulationSubTick(int tickNum) {
-        if (shouldClock && !DriverStation.isAutonomous() && DriverStation.isEnabled()) {
+        if (shouldClock && !RobotState.isAutonomous() && RobotState.isEnabled()) {
             clock -= getSimulationDt().in(Units.Seconds);
 
             if (clock <= 0) {
@@ -320,7 +322,7 @@ public class Arena2026Rebuilt extends SimulatedArena implements Arena2026 {
             }
         } else {
             clock = 25;
-            String fmsMessage = DriverStation.getGameSpecificMessage();
+            String fmsMessage = MatchState.getGameData().orElse("");
             if (fmsMessage != null) {
                 // 'B' means Blue is inactive first (Active in Shifts 2 & 4), so Red starts
                 // Active (blueIsOnClock = false).
@@ -352,9 +354,9 @@ public class Arena2026Rebuilt extends SimulatedArena implements Arena2026 {
      */
     public boolean isActive(boolean isBlue) {
         if (isBlue) {
-            return blueIsOnClock || DriverStation.isAutonomous() || !shouldClock;
+            return blueIsOnClock || RobotState.isAutonomous() || !shouldClock;
         } else {
-            return !blueIsOnClock || DriverStation.isAutonomous() || !shouldClock;
+            return !blueIsOnClock || RobotState.isAutonomous() || !shouldClock;
         }
     }
 

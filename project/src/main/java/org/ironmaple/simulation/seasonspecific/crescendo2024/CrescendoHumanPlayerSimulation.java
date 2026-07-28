@@ -2,9 +2,9 @@ package org.ironmaple.simulation.seasonspecific.crescendo2024;
 
 import static org.ironmaple.utils.LegacyFieldMirroringUtils2024.toCurrentAllianceTranslation;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.system.Timer;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation;
 
@@ -19,9 +19,9 @@ public class CrescendoHumanPlayerSimulation implements SimulatedArena.Simulatabl
 
     @Override
     public void simulationSubTick(int subTickNum) {
-        if (!DriverStation.isTeleopEnabled()) return;
+        if (!RobotState.isTeleopEnabled()) return;
 
-        if (Timer.getFPGATimestamp() - previousThrowTimeSeconds < 1) return;
+        if (Timer.getMonotonicTimestamp() - previousThrowTimeSeconds < 1) return;
 
         final Translation2d sourcePosition = toCurrentAllianceTranslation(BLUE_SOURCE_POSITION);
         /*
@@ -34,6 +34,6 @@ public class CrescendoHumanPlayerSimulation implements SimulatedArena.Simulatabl
 
         /* otherwise, place a note */
         arena.getGamePieceManager().spawnOnField(new CrescendoNoteOnField(sourcePosition));
-        previousThrowTimeSeconds = Timer.getFPGATimestamp();
+        previousThrowTimeSeconds = Timer.getMonotonicTimestamp();
     }
 }

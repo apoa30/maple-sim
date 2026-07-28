@@ -1,10 +1,10 @@
 package org.ironmaple.simulation.physics.jolt;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.units.measure.Time;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.units.measure.Time;
 import java.util.Optional;
 import org.ironmaple.simulation.physics.PhysicsBackend;
 import org.ironmaple.simulation.physics.PhysicsBody;

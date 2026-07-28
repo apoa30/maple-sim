@@ -1,21 +1,21 @@
 package org.ironmaple.simulation;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Volts;
+import static org.wpilib.units.Units.Amps;
+import static org.wpilib.units.Units.Radians;
+import static org.wpilib.units.Units.RadiansPerSecond;
+import static org.wpilib.units.Units.Volts;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.Voltage;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Transform3d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.AngularVelocity;
+import org.wpilib.units.measure.Current;
+import org.wpilib.units.measure.LinearVelocity;
+import org.wpilib.units.measure.Voltage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -235,7 +235,7 @@ public class ShooterSimulation3D implements SimulatedArena3D.Simulatable {
         Pose3d shooterPoseWorld = robotPose.plus(robotToShooter);
 
         // 2. Calculate Muzzle Velocity in World Frame
-        double vMuzzle = velocity.in(edu.wpi.first.units.Units.MetersPerSecond);
+        double vMuzzle = velocity.in(org.wpilib.units.Units.MetersPerSecond);
         double pitchRad = pitch.in(Radians);
 
         // Velocity components in shooter's local frame (X = forward, Z = up)
@@ -247,8 +247,8 @@ public class ShooterSimulation3D implements SimulatedArena3D.Simulatable {
         Translation2d vXYWorldFromMuzzle = new Translation2d(vXLocal, 0).rotateBy(shooterYaw);
 
         // Add robot velocity
-        ChassisSpeeds robotSpeeds = driveTrainSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative();
-        Translation2d robotVXY = new Translation2d(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond);
+        ChassisVelocities robotSpeeds = driveTrainSimulation.getDriveTrainSimulatedChassisVelocitiesFieldRelative();
+        Translation2d robotVXY = new Translation2d(robotSpeeds.vx, robotSpeeds.vy);
         Translation2d totalVXY = vXYWorldFromMuzzle.plus(robotVXY);
 
         Translation3d initialVelocity = new Translation3d(totalVXY.getX(), totalVXY.getY(), vZLocal);

@@ -1,21 +1,22 @@
 package org.ironmaple.simulation.seasonspecific.rebuilt2026;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Kilograms;
-import static edu.wpi.first.units.Units.MetersPerSecond;
+import static org.wpilib.units.Units.Degrees;
+import static org.wpilib.units.Units.Kilograms;
+import static org.wpilib.units.Units.MetersPerSecond;
 import static org.ironmaple.utils.FieldMirroringUtils.flip;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.networktables.BooleanPublisher;
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.wpilibj.DriverStation;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.networktables.BooleanPublisher;
+import org.wpilib.networktables.DoublePublisher;
+import org.wpilib.units.Units;
+import org.wpilib.units.measure.Angle;
+import org.wpilib.units.measure.Distance;
+import org.wpilib.units.measure.LinearVelocity;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.RobotState;
 import org.ironmaple.simulation.SimulatedArena3D;
 import org.ironmaple.simulation.gamepieces.FuelBall;
 import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation3D;
@@ -106,7 +107,7 @@ public class Arena2026Rebuilt3D extends SimulatedArena3D implements Arena2026 {
         var projectile = new RebuiltFuelOnFly(
                 piecePose.plus(new Translation2d(randomInRange(xVariance), randomInRange(yVariance))),
                 new Translation2d(),
-                new ChassisSpeeds(),
+                new ChassisVelocities(),
                 yaw.plus(Rotation2d.fromDegrees(randomInRange(yawVariance))),
                 height,
                 speed.plus(MetersPerSecond.of(randomInRange(speedVariance))),
@@ -127,8 +128,8 @@ public class Arena2026Rebuilt3D extends SimulatedArena3D implements Arena2026 {
         // Spacing uses MAX possible diameter to ensure no overlap + gap
         double spacing = maxDiameter + fuelSeparationGap;
 
-        double boundingBoxWidth = edu.wpi.first.units.Units.Inches.of(206).in(edu.wpi.first.units.Units.Meters);
-        double boundingBoxDepth = edu.wpi.first.units.Units.Inches.of(72).in(edu.wpi.first.units.Units.Meters);
+        double boundingBoxWidth = org.wpilib.units.Units.Inches.of(206).in(org.wpilib.units.Units.Meters);
+        double boundingBoxDepth = org.wpilib.units.Units.Inches.of(72).in(org.wpilib.units.Units.Meters);
 
         java.util.List<Translation2d> q1 = new java.util.ArrayList<>();
         java.util.List<Translation2d> q2 = new java.util.ArrayList<>();
@@ -136,7 +137,7 @@ public class Arena2026Rebuilt3D extends SimulatedArena3D implements Arena2026 {
         java.util.List<Translation2d> q4 = new java.util.ArrayList<>();
 
         // Generate points for one quadrant (Q1) starting from the center outward
-        double dividerWidth = edu.wpi.first.units.Units.Inches.of(2).in(edu.wpi.first.units.Units.Meters);
+        double dividerWidth = org.wpilib.units.Units.Inches.of(2).in(org.wpilib.units.Units.Meters);
         double startX = dividerWidth / 2 + fuelSeparationGap + fuelRadius;
         double startY = dividerWidth / 2 + fuelSeparationGap + fuelRadius;
 
@@ -191,7 +192,7 @@ public class Arena2026Rebuilt3D extends SimulatedArena3D implements Arena2026 {
                                         pos2d.getX(),
                                         pos2d.getY(),
                                         fuelRadius * 1.03,
-                                        new edu.wpi.first.math.geometry.Rotation3d()));
+                                        new org.wpilib.math.geometry.Rotation3d()));
                     } else {
                         // Spawn 3D piece (Standard)
                         piece = new GamePieceOnFieldSimulation3D(
@@ -201,7 +202,7 @@ public class Arena2026Rebuilt3D extends SimulatedArena3D implements Arena2026 {
                                         pos2d.getX(),
                                         pos2d.getY(),
                                         fuelRadius * 1.03,
-                                        new edu.wpi.first.math.geometry.Rotation3d()));
+                                        new org.wpilib.math.geometry.Rotation3d()));
                     }
                     // Register dynamic body
                     dynamicBodies.put(piece, piece.getPhysicsBody());
@@ -232,7 +233,7 @@ public class Arena2026Rebuilt3D extends SimulatedArena3D implements Arena2026 {
                                     // Spawn Z: Nominal radius + 3% (2% variance + 1% safety) to prevent floor
                                     // penetration
                                     fuelRadius * 1.03,
-                                    new edu.wpi.first.math.geometry.Rotation3d()));
+                                    new org.wpilib.math.geometry.Rotation3d()));
                 } else {
                     pieceBlue = new GamePieceOnFieldSimulation3D(
                             this,
@@ -243,7 +244,7 @@ public class Arena2026Rebuilt3D extends SimulatedArena3D implements Arena2026 {
                                     // Spawn Z: Nominal radius + 3% (2% variance + 1% safety) to prevent floor
                                     // penetration
                                     fuelRadius * 1.03,
-                                    new edu.wpi.first.math.geometry.Rotation3d()));
+                                    new org.wpilib.math.geometry.Rotation3d()));
                 }
                 dynamicBodies.put(pieceBlue, pieceBlue.getPhysicsBody());
 
@@ -259,7 +260,7 @@ public class Arena2026Rebuilt3D extends SimulatedArena3D implements Arena2026 {
                                     // Spawn Z: Nominal radius + 3% (2% variance + 1% safety) to prevent floor
                                     // penetration
                                     fuelRadius * 1.03,
-                                    new edu.wpi.first.math.geometry.Rotation3d()));
+                                    new org.wpilib.math.geometry.Rotation3d()));
                 } else {
                     pieceRed = new GamePieceOnFieldSimulation3D(
                             this,
@@ -270,7 +271,7 @@ public class Arena2026Rebuilt3D extends SimulatedArena3D implements Arena2026 {
                                     // Spawn Z: Nominal radius + 3% (2% variance + 1% safety) to prevent floor
                                     // penetration
                                     fuelRadius * 1.03,
-                                    new edu.wpi.first.math.geometry.Rotation3d()));
+                                    new org.wpilib.math.geometry.Rotation3d()));
                 }
                 dynamicBodies.put(pieceRed, pieceRed.getPhysicsBody());
             }
@@ -284,7 +285,7 @@ public class Arena2026Rebuilt3D extends SimulatedArena3D implements Arena2026 {
 
     @Override
     protected void simulationSubTick(int tickNum) {
-        if (shouldClock && !DriverStation.isAutonomous() && DriverStation.isEnabled()) {
+        if (shouldClock && !RobotState.isAutonomous() && RobotState.isEnabled()) {
             clock -= getSimulationDt().in(Units.Seconds);
 
             if (clock <= 0) {
@@ -293,7 +294,7 @@ public class Arena2026Rebuilt3D extends SimulatedArena3D implements Arena2026 {
             }
         } else {
             clock = 25;
-            String fmsMessage = DriverStation.getGameSpecificMessage();
+            String fmsMessage = MatchState.getGameData().orElse("");
             if (fmsMessage != null) {
                 if (fmsMessage.contains("B")) blueIsOnClock = false;
                 else if (fmsMessage.contains("R")) blueIsOnClock = true;
@@ -310,9 +311,9 @@ public class Arena2026Rebuilt3D extends SimulatedArena3D implements Arena2026 {
 
     public boolean isActive(boolean isBlue) {
         if (isBlue) {
-            return blueIsOnClock || DriverStation.isAutonomous() || !shouldClock;
+            return blueIsOnClock || RobotState.isAutonomous() || !shouldClock;
         } else {
-            return !blueIsOnClock || DriverStation.isAutonomous() || !shouldClock;
+            return !blueIsOnClock || RobotState.isAutonomous() || !shouldClock;
         }
     }
 

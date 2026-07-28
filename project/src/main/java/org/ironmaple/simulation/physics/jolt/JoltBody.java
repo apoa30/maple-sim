@@ -2,9 +2,9 @@ package org.ironmaple.simulation.physics.jolt;
 
 import com.github.stephengold.joltjni.*;
 import com.github.stephengold.joltjni.enumerate.EActivation;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Translation3d;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.ironmaple.simulation.physics.PhysicsBody;
 
@@ -284,13 +284,13 @@ public class JoltBody implements PhysicsBody {
 
     /** Converts WPILib Rotation3d to Jolt Quat. */
     public static Quat toQuat(Rotation3d r) {
-        edu.wpi.first.math.geometry.Quaternion q = r.getQuaternion();
+        org.wpilib.math.geometry.Quaternion q = r.getQuaternion();
         return new Quat((float) q.getX(), (float) q.getY(), (float) q.getZ(), (float) q.getW());
     }
 
     /** Converts Jolt Quat to WPILib Rotation3d. */
     public static Rotation3d toRotation3d(Quat q) {
-        return new Rotation3d(new edu.wpi.first.math.geometry.Quaternion(q.getW(), q.getX(), q.getY(), q.getZ()));
+        return new Rotation3d(new org.wpilib.math.geometry.Quaternion(q.getW(), q.getX(), q.getY(), q.getZ()));
     }
 
     /** Converts Jolt position and rotation to WPILib Pose3d. */

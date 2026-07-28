@@ -1,20 +1,22 @@
 package org.ironmaple.simulation;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.networktables.BooleanPublisher;
-import edu.wpi.first.networktables.BooleanSubscriber;
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.networktables.BooleanPublisher;
+import org.wpilib.networktables.BooleanSubscriber;
+import org.wpilib.networktables.DoublePublisher;
+import org.wpilib.networktables.NetworkTable;
+import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.units.Units;
+import org.wpilib.units.measure.Time;
+
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.framework.TimedRobot;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.framework.RobotBase;
 import java.util.*;
 import org.ironmaple.simulation.debugging.SimDebugLogger;
 import org.ironmaple.simulation.gamepieces.GamePiece;
@@ -128,7 +130,7 @@ public abstract class SimulatedArena3D implements Arena {
 
     /** The period length of each sub-tick, in seconds. */
     private static Time SIMULATION_DT =
-            edu.wpi.first.units.Units.Seconds.of(TimedRobot.kDefaultPeriod / SIMULATION_SUB_TICKS_IN_1_PERIOD);
+            org.wpilib.units.Units.Seconds.of(TimedRobot.DEFAULT_PERIOD / SIMULATION_SUB_TICKS_IN_1_PERIOD);
 
     public static Time getSimulationDt() {
         return SIMULATION_DT;
@@ -203,7 +205,7 @@ public abstract class SimulatedArena3D implements Arena {
                 try {
                     shape = physicsEngine.createCompoundShapeFromMesh(obstacle.meshResourcePath());
                 } catch (Exception e) {
-                    DriverStation.reportError(
+                    DriverStationErrors.reportError(
                             "Failed to load mesh obstacle: " + obstacle.meshResourcePath(), e.getStackTrace());
                 }
             } else if (shape == null && obstacle.halfExtents() != null) {
@@ -479,13 +481,13 @@ public abstract class SimulatedArena3D implements Arena {
     }
 
     public int getScore(Alliance allianceColor) {
-        return getScore(allianceColor == Alliance.Blue);
+        return getScore(allianceColor == Alliance.BLUE);
     }
 
     public void addToScore(boolean isBlue, int toAdd) {
         if (isBlue) blueScore += toAdd;
         else redScore += toAdd;
-        addValueToMatchBreakdown(isBlue, DriverStation.isAutonomous() ? "Auto/AutoScore" : "TeleopScore", toAdd);
+        addValueToMatchBreakdown(isBlue, RobotState.isAutonomous() ? "Auto/AutoScore" : "TeleopScore", toAdd);
     }
 
     public void enableBreakdownPublishing() {
@@ -732,7 +734,7 @@ public abstract class SimulatedArena3D implements Arena {
             Translation3d halfExtents = new Translation3d(length / 2, thickness / 2, height / 2);
             Pose3d pose = new Pose3d(
                     new Translation3d(center.getX(), center.getY(), height / 2),
-                    new edu.wpi.first.math.geometry.Rotation3d(0, 0, angle));
+                    new org.wpilib.math.geometry.Rotation3d(0, 0, angle));
 
             obstacles.add(new Obstacle(null, pose, halfExtents));
         }

@@ -1,6 +1,6 @@
 package org.ironmaple.utils;
 
-import edu.wpi.first.math.geometry.Translation3d;
+import org.wpilib.math.geometry.Translation3d;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

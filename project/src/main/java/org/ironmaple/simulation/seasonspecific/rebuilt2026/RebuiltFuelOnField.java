@@ -1,11 +1,11 @@
 package org.ironmaple.simulation.seasonspecific.rebuilt2026;
 
-import static edu.wpi.first.units.Units.Centimeters;
-import static edu.wpi.first.units.Units.Pounds;
+import static org.wpilib.units.Units.Centimeters;
+import static org.wpilib.units.Units.Pounds;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
 import org.dyn4j.geometry.Circle;
 import org.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation;
 

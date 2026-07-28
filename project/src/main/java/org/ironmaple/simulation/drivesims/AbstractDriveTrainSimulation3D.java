@@ -1,13 +1,13 @@
 package org.ironmaple.simulation.drivesims;
 
-import static edu.wpi.first.units.Units.Meters;
+import static org.wpilib.units.Units.Meters;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -146,7 +146,7 @@ public abstract class AbstractDriveTrainSimulation3D implements SimulatedArena3D
                 new Rotation3d(0, 0, initialPose.getRotation().getRadians()));
 
         // Create the dynamic body
-        double massKg = config.robotMass.in(edu.wpi.first.units.Units.Kilograms);
+        double massKg = config.robotMass.in(org.wpilib.units.Units.Kilograms);
         this.physicsBody = physicsEngine.createDynamicBody(shape, massKg, pose3d);
 
         // Apply light damping to prevent drift (0.1 is standard value)
@@ -183,7 +183,7 @@ public abstract class AbstractDriveTrainSimulation3D implements SimulatedArena3D
      *
      * @param givenSpeeds the desired chassis speeds
      */
-    public void setRobotSpeeds(ChassisSpeeds givenSpeeds) {
+    public void setRobotSpeeds(ChassisVelocities givenSpeeds) {
         if (physicsBody == null) return;
 
         // Convert robot-relative speeds to field-relative for the physics body
@@ -191,12 +191,12 @@ public abstract class AbstractDriveTrainSimulation3D implements SimulatedArena3D
         double heading = pose.getRotation().getZ();
 
         double vx =
-                givenSpeeds.vxMetersPerSecond * Math.cos(heading) - givenSpeeds.vyMetersPerSecond * Math.sin(heading);
+                givenSpeeds.vx * Math.cos(heading) - givenSpeeds.vy * Math.sin(heading);
         double vy =
-                givenSpeeds.vxMetersPerSecond * Math.sin(heading) + givenSpeeds.vyMetersPerSecond * Math.cos(heading);
+                givenSpeeds.vx * Math.sin(heading) + givenSpeeds.vy * Math.cos(heading);
 
         physicsBody.setLinearVelocityMPS(new Translation3d(vx, vy, 0));
-        physicsBody.setAngularVelocityRadPerSec(new Translation3d(0, 0, givenSpeeds.omegaRadiansPerSecond));
+        physicsBody.setAngularVelocityRadPerSec(new Translation3d(0, 0, givenSpeeds.omega));
     }
 
     /**
@@ -258,10 +258,10 @@ public abstract class AbstractDriveTrainSimulation3D implements SimulatedArena3D
      *
      * @return the chassis speeds, robot-relative
      */
-    public ChassisSpeeds getDriveTrainSimulatedChassisSpeedsRobotRelative() {
-        ChassisSpeeds fieldRelative = getDriveTrainSimulatedChassisSpeedsFieldRelative();
-        return ChassisSpeeds.fromFieldRelativeSpeeds(
-                fieldRelative, getSimulatedDriveTrainPose().getRotation());
+    public ChassisVelocities getDriveTrainSimulatedChassisVelocitiesRobotRelative() {
+        ChassisVelocities fieldRelative = getDriveTrainSimulatedChassisVelocitiesFieldRelative();
+        return fieldRelative.toRobotRelative(
+                getSimulatedDriveTrainPose().getRotation());
     }
 
     /**
@@ -271,13 +271,13 @@ public abstract class AbstractDriveTrainSimulation3D implements SimulatedArena3D
      *
      * @return the chassis speeds, field-relative
      */
-    public ChassisSpeeds getDriveTrainSimulatedChassisSpeedsFieldRelative() {
-        if (physicsBody == null) return new ChassisSpeeds();
+    public ChassisVelocities getDriveTrainSimulatedChassisVelocitiesFieldRelative() {
+        if (physicsBody == null) return new ChassisVelocities();
 
         Translation3d linearVel = physicsBody.getLinearVelocityMPS();
         Translation3d angularVel = physicsBody.getAngularVelocityRadPerSec();
 
-        return new ChassisSpeeds(linearVel.getX(), linearVel.getY(), angularVel.getZ());
+        return new ChassisVelocities(linearVel.getX(), linearVel.getY(), angularVel.getZ());
     }
 
     /**
@@ -377,7 +377,7 @@ public abstract class AbstractDriveTrainSimulation3D implements SimulatedArena3D
             // relativePose is a Transform3d equivalent.
             // But we have Pose3d. Converting Pose3d to Transform3d is trivial.
 
-            Pose3d worldPose = robotPose.transformBy(new edu.wpi.first.math.geometry.Transform3d(
+            Pose3d worldPose = robotPose.transformBy(new org.wpilib.math.geometry.Transform3d(
                     relativePose.getTranslation(), relativePose.getRotation()));
 
             mechanism.body.setPose3d(worldPose);
@@ -416,7 +416,7 @@ public abstract class AbstractDriveTrainSimulation3D implements SimulatedArena3D
 
             // Calculate initial world pose
             Pose3d robotPose = physicsBody != null ? physicsBody.getPose3d() : new Pose3d();
-            Pose3d worldPose = robotPose.transformBy(new edu.wpi.first.math.geometry.Transform3d(
+            Pose3d worldPose = robotPose.transformBy(new org.wpilib.math.geometry.Transform3d(
                     initialRobotRelativePose.getTranslation(), initialRobotRelativePose.getRotation()));
 
             // Create kinematic body (moved by code, pushes dynamic bodies)

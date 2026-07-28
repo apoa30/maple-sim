@@ -1,12 +1,12 @@
 package org.ironmaple.simulation.drivesims;
 
-import static edu.wpi.first.units.Units.*;
+import static org.wpilib.units.Units.*;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.units.measure.*;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.kinematics.SwerveDriveOdometry;
+import org.wpilib.math.kinematics.SwerveModuleVelocity;
+import org.wpilib.units.measure.*;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import org.dyn4j.geometry.Vector2;
@@ -281,7 +281,7 @@ public class SwerveModuleSimulation {
             double availableGrip = Math.sqrt(Math.max(0, availableGripSquared));
 
             // Clamp lateral force
-            lateralForceNewtons = MathUtil.clamp(lateralForceNewtons, -availableGrip, availableGrip);
+            lateralForceNewtons = Math.clamp(lateralForceNewtons, -availableGrip, availableGrip);
         }
 
         // if the module is skidding (longitudinally)
@@ -310,7 +310,7 @@ public class SwerveModuleSimulation {
      * @return The calculated force vector
      */
     public Vector2 getModuleForceFromState(
-            SwerveModuleState state,
+            SwerveModuleVelocity state,
             Vector2 moduleCurrentGroundVelocity,
             Rotation2d robotFacing,
             double grippingForceNewtons) {
@@ -323,7 +323,7 @@ public class SwerveModuleSimulation {
                 * Math.cos(moduleCurrentGroundVelocity.getAngleBetween(new Vector2(moduleWorldFacing.getRadians())));
 
         // Desired speed from snapshot
-        double desiredSpeedMPS = state.speedMetersPerSecond;
+        double desiredSpeedMPS = state.velocity;
 
         // Simple linear friction model for slip:
         // Force = Stiffness * SlipVelocity
@@ -396,8 +396,8 @@ public class SwerveModuleSimulation {
     }
 
     /** @return the current module state of this simulation module */
-    public SwerveModuleState getCurrentState() {
-        return new SwerveModuleState(
+    public SwerveModuleVelocity getCurrentState() {
+        return new SwerveModuleVelocity(
                 MetersPerSecond.of(getDriveWheelFinalSpeed().in(RadiansPerSecond) * config.WHEEL_RADIUS.in(Meters)),
                 getSteerAbsoluteFacing());
     }
@@ -412,8 +412,8 @@ public class SwerveModuleSimulation {
      *
      * @return the free spinning module state
      */
-    protected SwerveModuleState getFreeSpinState() {
-        return new SwerveModuleState(
+    protected SwerveModuleVelocity getFreeSpinState() {
+        return new SwerveModuleVelocity(
                 config.driveMotorConfigs
                                 .calculateMechanismVelocity(
                                         config.driveMotorConfigs.calculateCurrent(config.driveMotorConfigs.friction),

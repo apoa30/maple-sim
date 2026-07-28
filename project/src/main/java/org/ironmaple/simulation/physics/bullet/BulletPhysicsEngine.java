@@ -5,10 +5,12 @@ import com.jme3.bullet.collision.shapes.*;
 import com.jme3.bullet.objects.PhysicsRigidBody;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.units.measure.Time;
+
+import org.wpilib.framework.RobotBase;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.units.measure.Time;
 import electrostatic4j.snaploader.LibraryInfo;
 import electrostatic4j.snaploader.LoadingCriterion;
 import electrostatic4j.snaploader.NativeBinaryLoader;
@@ -40,7 +42,7 @@ public class BulletPhysicsEngine implements PhysicsEngine {
     public synchronized void initialize() {
         if (initialized) return;
 
-        if (edu.wpi.first.wpilibj.RobotBase.isReal()) {
+        if (RobotBase.isReal()) {
             throw new IllegalStateException(
                     "CRITICAL: 3D Physics Engines (Jolt/Bullet) CANNOT be executed on the RoboRIO. "
                             + "They rely on un-compiled heavy native binaries and require heavy multi-threading. "
@@ -491,14 +493,14 @@ public class BulletPhysicsEngine implements PhysicsEngine {
 
     /** Converts WPILib Rotation3d to Bullet Quaternion. */
     public static Quaternion toQuaternion(Rotation3d rotation) {
-        edu.wpi.first.math.geometry.Quaternion wpilibQuat = rotation.getQuaternion();
+        org.wpilib.math.geometry.Quaternion wpilibQuat = rotation.getQuaternion();
         return new Quaternion((float) wpilibQuat.getX(), (float) wpilibQuat.getY(), (float) wpilibQuat.getZ(), (float)
                 wpilibQuat.getW());
     }
 
     /** Converts Bullet Quaternion to WPILib Rotation3d. */
     public static Rotation3d toRotation3d(Quaternion quaternion) {
-        return new Rotation3d(new edu.wpi.first.math.geometry.Quaternion(
+        return new Rotation3d(new org.wpilib.math.geometry.Quaternion(
                 quaternion.getW(), quaternion.getX(), quaternion.getY(), quaternion.getZ()));
     }
 

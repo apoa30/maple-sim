@@ -1,14 +1,14 @@
 package org.ironmaple.simulation.drivesims;
 
-import static edu.wpi.first.units.Units.*;
+import static org.wpilib.units.Units.*;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.units.measure.*;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.math.kinematics.SwerveDriveKinematics;
+import org.wpilib.units.measure.*;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -126,7 +126,7 @@ public class SwerveDriveSimulation3D extends AbstractDriveTrainSimulation3D {
         double currentBodyYaw = pose3d.getRotation().getZ();
         if (previousBodyYaw == null) previousBodyYaw = currentBodyYaw;
 
-        double dYaw = edu.wpi.first.math.MathUtil.angleModulus(Rotation2d.fromRadians(currentBodyYaw)
+        double dYaw = org.wpilib.math.util.MathUtil.angleModulus(Rotation2d.fromRadians(currentBodyYaw)
                 .minus(Rotation2d.fromRadians(previousBodyYaw))
                 .getRadians());
 
@@ -152,7 +152,7 @@ public class SwerveDriveSimulation3D extends AbstractDriveTrainSimulation3D {
      *
      * <h2>Rotates a Point by a 3D Rotation.</h2>
      */
-    private Translation3d rotatePoint(Translation3d point, edu.wpi.first.math.geometry.Rotation3d rotation) {
+    private Translation3d rotatePoint(Translation3d point, org.wpilib.math.geometry.Rotation3d rotation) {
         // Use quaternion rotation
         var quaternion = rotation.getQuaternion();
         double qw = quaternion.getW(), qx = quaternion.getX(), qy = quaternion.getY(), qz = quaternion.getZ();
@@ -265,7 +265,7 @@ public class SwerveDriveSimulation3D extends AbstractDriveTrainSimulation3D {
         boolean isThreaded = false; // Sync mode by definition
 
         // Calculate per-wheel mass for damping
-        double robotMassKg = config.robotMass.in(edu.wpi.first.units.Units.Kilograms);
+        double robotMassKg = config.robotMass.in(org.wpilib.units.Units.Kilograms);
         double massPerWheel = robotMassKg / moduleTranslations.length;
         double criticalDamping = calculateCriticalDamping(massPerWheel);
         double baseDamping = TARGET_DAMPING_RATIO * criticalDamping;

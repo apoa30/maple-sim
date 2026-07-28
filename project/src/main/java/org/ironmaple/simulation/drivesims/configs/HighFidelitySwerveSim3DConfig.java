@@ -1,8 +1,8 @@
 package org.ironmaple.simulation.drivesims.configs;
 
-import static edu.wpi.first.units.Units.*;
+import static org.wpilib.units.Units.*;
 
-import edu.wpi.first.units.measure.*;
+import org.wpilib.units.measure.*;
 import org.ironmaple.simulation.drivesims.tire.PacejkaTireModel.PacejkaCoefficients;
 
 /**

@@ -1,17 +1,17 @@
 package org.ironmaple.simulation.drivesims;
 
-import static edu.wpi.first.units.Units.*;
+import static org.wpilib.units.Units.*;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.units.measure.*;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.math.kinematics.SwerveDriveKinematics;
+import org.wpilib.math.kinematics.SwerveModuleVelocity;
+import org.wpilib.units.measure.*;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -71,7 +71,7 @@ public class HighFidelitySwerveSim3D extends AbstractDriveTrainSimulation3D {
 
     // ==================== Latency Simulation ====================
     @SuppressWarnings("unchecked")
-    private final LatencyBuffer<SwerveModuleState>[] commandLatencyBuffers;
+    private final LatencyBuffer<SwerveModuleVelocity>[] commandLatencyBuffers;
 
     private final SensorNoiseModel[] driveEncoderNoise;
     private final SensorNoiseModel[] steerEncoderNoise;
@@ -148,7 +148,7 @@ public class HighFidelitySwerveSim3D extends AbstractDriveTrainSimulation3D {
 
             for (int i = 0; i < numModules; i++) {
                 // Initialize with neutral state
-                SwerveModuleState neutralState = new SwerveModuleState(0, new Rotation2d());
+                SwerveModuleVelocity neutralState = new SwerveModuleVelocity(0, new Rotation2d());
                 commandLatencyBuffers[i] = new LatencyBuffer<>(delaySeconds, neutralState);
                 driveEncoderNoise[i] = new SensorNoiseModel(posNoiseRad, velNoiseRadPerSec);
                 steerEncoderNoise[i] = new SensorNoiseModel(posNoiseRad, velNoiseRadPerSec);
@@ -217,7 +217,7 @@ public class HighFidelitySwerveSim3D extends AbstractDriveTrainSimulation3D {
             }
 
             // --- 2. Get module state (with latency if enabled) ---
-            SwerveModuleState moduleState = getModuleStateWithLatency(i, module);
+            SwerveModuleVelocity moduleState = getModuleStateWithLatency(i, module);
 
             // --- 3. Calculate ground velocity at contact point ---
             Translation3d contactVelocity3d = physicsBody.getLinearVelocityAtPointMPS(suspension.worldMountPoint);
@@ -230,7 +230,7 @@ public class HighFidelitySwerveSim3D extends AbstractDriveTrainSimulation3D {
             double groundLatVel = -contactVelocity3d.getX() * sinAngle + contactVelocity3d.getY() * cosAngle;
 
             // --- 4. Calculate slip ---
-            double wheelSpeedMPS = moduleState.speedMetersPerSecond;
+            double wheelSpeedMPS = moduleState.velocity;
             double longitudinalSlip = PacejkaTireModel.calculateLongitudinalSlip(wheelSpeedMPS, groundLongVel);
             double slipAngle = PacejkaTireModel.calculateSlipAngle(groundLatVel, Math.abs(groundLongVel));
 
@@ -340,8 +340,8 @@ public class HighFidelitySwerveSim3D extends AbstractDriveTrainSimulation3D {
      *
      * <h2>Gets Module State with Optional Latency.</h2>
      */
-    private SwerveModuleState getModuleStateWithLatency(int moduleIndex, SwerveModuleSimulation module) {
-        SwerveModuleState currentState = module.getCurrentState();
+    private SwerveModuleVelocity getModuleStateWithLatency(int moduleIndex, SwerveModuleSimulation module) {
+        SwerveModuleVelocity currentState = module.getCurrentState();
 
         if (!hifiConfig.enableLatencySimulation || commandLatencyBuffers == null) {
             return currentState;

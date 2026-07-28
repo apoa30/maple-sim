@@ -1,8 +1,8 @@
 package org.ironmaple.simulation.gamepieces;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Mass;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.units.Units;
+import org.wpilib.units.measure.Mass;
 import org.ironmaple.simulation.SimulatedArena3D;
 import org.ironmaple.simulation.physics.PhysicsShape;
 import org.ironmaple.simulation.physics.jolt.JoltPhysicsEngine;
