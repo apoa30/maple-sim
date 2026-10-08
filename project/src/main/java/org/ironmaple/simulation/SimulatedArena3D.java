@@ -15,7 +15,7 @@ import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.framework.TimedRobot;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 import org.wpilib.framework.RobotBase;
 import java.util.*;
 import org.ironmaple.simulation.debugging.SimDebugLogger;
@@ -277,7 +277,7 @@ public abstract class SimulatedArena3D implements Arena {
             double cpuTimeMs = (System.nanoTime() - t0) / 1_000_000.0;
             this.lastPhysicsCpuTimeSeconds = cpuTimeMs / 1000.0;
 
-            SmartDashboard.putNumber("MapleSim3D/PhysicsEngineCPUTimeMS", cpuTimeMs);
+            Telemetry.log("MapleSim3D/PhysicsEngineCPUTimeMS", cpuTimeMs);
             SimDebugLogger.logPerformance(String.format("Sim Periodic Time: %.3f ms", cpuTimeMs));
 
             if (resetFieldSubscriber.get()) {

@@ -17,7 +17,7 @@ import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.framework.RobotBase;
 import org.wpilib.framework.TimedRobot;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 import java.util.*;
 import java.util.function.DoubleSupplier;
 import java.util.stream.Collectors;
@@ -584,7 +584,7 @@ public abstract class SimulatedArena implements Arena {
 
             matchClock += getSimulationDt().in(Seconds);
 
-            SmartDashboard.putNumber("MapleArenaSimulation/Dyn4jEngineCPUTimeMS", (System.nanoTime() - t0) / 1000000.0);
+            Telemetry.log("MapleArenaSimulation/Dyn4jEngineCPUTimeMS", (System.nanoTime() - t0) / 1000000.0);
 
             if (resetFieldSubscriber.get()) {
                 SimulatedArena.getInstance().resetFieldForAuto();

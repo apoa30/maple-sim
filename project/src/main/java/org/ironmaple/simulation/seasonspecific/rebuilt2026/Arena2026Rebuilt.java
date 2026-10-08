@@ -71,13 +71,13 @@ public class Arena2026Rebuilt extends SimulatedArena implements Arena2026 {
 
             // blue hub
             super.addRectangularObstacle(
-                    1.19, 1.19, new Pose2d(RebuiltHub.BLUE_HUB_POS.toTranslation2d(), Rotation2d.kZero));
+                    1.19, 1.19, new Pose2d(RebuiltHub.BLUE_HUB_POS.toTranslation2d(), Rotation2d.ZERO));
 
             // blue trench barrier right
-            super.addRectangularObstacle(1.194, 0.305, new Pose2d(blueTrenchRightPos, Rotation2d.kZero));
+            super.addRectangularObstacle(1.194, 0.305, new Pose2d(blueTrenchRightPos, Rotation2d.ZERO));
 
             // blue trench barrier left
-            super.addRectangularObstacle(1.19, 0.305, new Pose2d(blueTrenchLeftPos, Rotation2d.kZero));
+            super.addRectangularObstacle(1.19, 0.305, new Pose2d(blueTrenchLeftPos, Rotation2d.ZERO));
 
             // blue tower poles
             super.addRectangularObstacle(
@@ -87,13 +87,13 @@ public class Arena2026Rebuilt extends SimulatedArena implements Arena2026 {
 
             // red hub
             super.addRectangularObstacle(
-                    1.19, 1.19, new Pose2d(RebuiltHub.RED_HUB_POS.toTranslation2d(), Rotation2d.kZero));
+                    1.19, 1.19, new Pose2d(RebuiltHub.RED_HUB_POS.toTranslation2d(), Rotation2d.ZERO));
 
             // red trench barrier right
-            super.addRectangularObstacle(1.19, 0.305, new Pose2d(redTrenchRightPos, Rotation2d.kZero));
+            super.addRectangularObstacle(1.19, 0.305, new Pose2d(redTrenchRightPos, Rotation2d.ZERO));
 
             // red trench barrier left
-            super.addRectangularObstacle(1.19, 0.305, new Pose2d(redTrenchLeftPos, Rotation2d.kZero));
+            super.addRectangularObstacle(1.19, 0.305, new Pose2d(redTrenchLeftPos, Rotation2d.ZERO));
 
             // red tower poles
             super.addRectangularObstacle(

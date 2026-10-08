@@ -306,7 +306,7 @@ public class HighFidelitySwerveSim3D extends AbstractDriveTrainSimulation3D {
                 physicsEngine.raycast(rayOrigin, rayDirection, maxRayDistance, physicsBody);
 
         double normalForceNewtons = 0.0;
-        Translation3d suspensionForce = Translation3d.kZero;
+        Translation3d suspensionForce = Translation3d.ZERO;
 
         if (hit.isPresent()) {
             PhysicsEngine.RaycastResult hitResult = hit.get();

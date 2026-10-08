@@ -4,13 +4,13 @@ plugins {
     id 'google-test'
     id("com.diffplug.spotless") version "7.0.0.BETA4"
     id "org.wpilib.WPILibRepositoriesPlugin" version "2027.0.0"
-    id 'org.wpilib.NativeUtils' version '2027.9.0'
+    id 'org.wpilib.NativeUtils' version '2027.10.0'
     id 'org.wpilib.GradleJni' version '2027.0.0'
     id 'org.wpilib.GradleVsCode' version '2027.0.0'
-    id "org.wpilib.GradleRIO" version "2027.0.0-alpha-6"
+    id "org.wpilib.GradleRIO" version "2027.0.0-alpha-7"
 }
 
-ext.wpilibVersion = "2027.0.0-alpha-6"
+ext.wpilibVersion = "2027.0.0-alpha-7"
 
 repositories {
     mavenCentral()
@@ -66,6 +66,8 @@ dependencies {
     implementation "org.wpilib.wpimath:wpimath-java:$wpilibVersion"
     implementation "org.wpilib.wpiunits:wpiunits-java:$wpilibVersion"
     implementation "org.wpilib.hal:hal-java:$wpilibVersion"
+    implementation "org.wpilib.telemetry:telemetry-java:$wpilibVersion"
+    implementation "org.wpilib.tunables:tunables-java:$wpilibVersion"
     implementation "org.ejml:ejml-simple:0.43.1"
     implementation "com.fasterxml.jackson.core:jackson-annotations:2.15.2"
     implementation "com.fasterxml.jackson.core:jackson-core:2.15.2"

@@ -315,7 +315,7 @@ public class SwerveDriveSimulation3D extends AbstractDriveTrainSimulation3D {
             hitResult = hit.orElse(null);
 
             double normalForceNewtons = 0.0;
-            Translation3d suspensionForce = Translation3d.kZero;
+            Translation3d suspensionForce = Translation3d.ZERO;
 
             if (hitResult != null) {
                 // Calculate distance from wheel center to ground

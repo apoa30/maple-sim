@@ -61,6 +61,6 @@ public class FieldMirroringUtils {
     }
 
     public static Rotation2d getCurrentAllianceDriverStationFacing() {
-        return toCurrentAllianceRotation(Rotation2d.kZero);
+        return toCurrentAllianceRotation(Rotation2d.ZERO);
     }
 }
